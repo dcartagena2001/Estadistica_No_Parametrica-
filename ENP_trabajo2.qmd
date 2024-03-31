@@ -1,0 +1,38 @@
+---
+lang: es
+format:
+  pdf:
+    include-in-header:
+      - text: |
+          \usepackage{float}
+          \usepackage[utf8]{inputenc}
+          \usepackage{amsmath}
+          \usepackage{array}
+          \usepackage{multirow}
+    cite-method: biblatex
+    bibliography: references.bib
+    geometry:
+      - top=2.54cm
+      - left=2.54cm
+      - heightrounded
+    fontfamily: libertinus
+    colorlinks: true
+execute:
+  echo: false
+  message: false
+  warning: false
+---
+```{=tex}
+\input{titlepage}
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+\thispagestyle{empty}
+\listoffigures
+\listoftables
+\newpage
+```
+```{=tex}
+\pagestyle{myheadings}
+\setcounter{page}{2}
+```
