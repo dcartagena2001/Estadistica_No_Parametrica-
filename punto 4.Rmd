@@ -1,0 +1,103 @@
+---
+title: "Punto tarea 2"
+output: html_document
+date: "2024-03-22"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Punto 4**
+
+-   Coeficiente de correlación de Pearson ( $ρ$ de Pearson): Mide la
+    correlación lineal entre dos variables cuantitativas. Se calculará a
+    partir de la covarianza de las variables dividida por el producto de
+    sus desviaciones estándar.
+
+-   Coeficiente de correlación de Kendall ($\tau$ de Kendall): Mide la
+    similitud de los órdenes de los datos cuando se clasifican por cada
+    una de las cantidades. Se basa en la diferencia entre la
+    probabilidad de que dos observaciones disponibles se ordenen de la
+    misma manera en ambas listas contra la probabilidad de que no lo
+    sean.
+
+-   Coeficiente de correlación de Spearman ( $ρ$ de Spearman): Es un
+    medida de correlación no paramétrica que evalúa la relación monótona
+    entre dos variables cuantitativas. Se calcula en base al rango de
+    los datos.
+
+Procedemos a calcular cada uno de estos coeficientes para los puntajes
+dados.
+
+Los coeficientes de correlación calculados entre los puntajes de bolos
+de la pareja de esposos son los siguientes:
+
+```{r}
+esposo <- c(147, 158, 131, 142, 183, 151, 196, 129, 155, 158)
+esposa <- c(122, 128, 125, 123, 115, 120, 108, 143, 124, 123)
+
+#  Pearson
+cor_pearson <- cor(esposo, esposa, method = "pearson")
+cor_pearson
+
+```
+
+Coeficiente de Correlación de Pearson: -0.805
+
+El coeficiente de Pearson de -0.805 indica una fuerte correlación
+negativa entre los puntajes de bolos del esposo y de la esposa. En
+términos prácticos, esto significa que, en general, cuando el puntaje
+del esposo aumenta, el puntaje de la esposa tiende a disminuir, y
+viceversa. Sin embargo, es importante recordar que Pearson mide
+relaciones lineales, por lo que este coeficiente está particularmente
+enfocado en cómo una variable aumenta o disminuye de manera lineal en
+relación con la otra.
+
+```{r}
+# Kendall
+cor_kendall <- cor(esposo, esposa, method = "kendall")
+cor_kendall
+
+```
+
+Coeficiente τ de Kendall: -0.523
+
+El coeficiente τ de Kendall de -0.523 también sugiere una correlación
+negativa, aunque no tan fuerte como la indicada por Pearson. Kendall
+mide la concordancia en los ordenamientos de los datos entre dos
+variables, lo que significa que puntajes más altos de un miembro de la
+pareja tienden a asociarse con puntajes más bajos del otro miembro, pero
+con menos énfasis en la linealidad de esa relación. Este coeficiente es
+útil para entender las tendencias generales en los datos que pueden no
+ser estrictamente lineales.
+
+```{r}
+#  Spearman
+cor_spearman <- cor(esposo, esposa, method = "spearman")
+cor_spearman
+
+```
+
+Coeficiente ρ de Spearman: -0.613
+
+El coeficiente ρ de Spearman de -0.613 indica una correlación negativa
+moderada a fuerte, similar a la de Pearson pero basada en rangos en
+lugar de valores exactos. Al igual que Kendall, Spearman es más robusto
+ante datos no normales o la presencia de valores atípicos. Este
+coeficiente sugiere que, en términos de rangos, existe una tendencia
+negativa moderada a fuerte entre los puntajes de bolos de la pareja.
+
+Conclusión
+
+Los tres coeficientes muestran una tendencia negativa en la relación
+entre los puntajes de bolos de la pareja, sugiriendo que no hay una
+dependencia directa en el sentido de que puntajes altos de uno impliquen
+puntajes altos del otro; de hecho, la tendencia es lo contrario. Esto
+podría interpretarse como que cuando uno de los dos tiene un buen día en
+el juego, el otro tiende a no tenerlo, aunque la interpretación exacta
+podría variar dependiendo de otros factores no considerados en este
+análisis.

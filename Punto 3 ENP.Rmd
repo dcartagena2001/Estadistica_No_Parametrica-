@@ -1,0 +1,105 @@
+---
+title: "Punto 3"
+output: html_document
+date: "2024-03-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+$H_0$: No existe diferencia en los niveles de asertividad entre los diferentes órdenes de nacimiento.
+
+$H_1$: Existe al menos una diferencia en los niveles de asertividad entre los diferentes órdenes de nacimiento.
+
+Dado que los datos no se distribuyen de manera normal y solo podemos asumir una escala ordinal, se necesita una prueba no paramétrica. La prueba de Kruskal-Wallis es la más adecuada aquí, ya que es un equivalente no paramétrico de la ANOVA de un solo factor y puede utilizarse para comparar más de dos grupos independientes sin la necesidad de normalidad.
+
+### **Estadístico de Prueba: Kruskal-Wallis**
+
+La prueba de Kruskal-Wallis evalúa si las medianas de los grupos son diferentes, basándose en los rangos de todas las observaciones. Es especialmente útil cuando las suposiciones de homogeneidad de varianzas o la normalidad de los grupos no se cumplen.
+
+```{r}
+library(dplyr)
+
+# Datos de asertividad
+primogenitos <- c(18, 8, 4, 21, 28, 32, 10)
+segundos <- c(18, 12, 3, 24, 22, 1, 14)
+terceros <- c(7, 19, 2, 30, 18, 5)
+
+# Crear un dataframe combinado con todos los datos
+datos <- data.frame(
+  asertividad = c(primogenitos, segundos, terceros),
+  orden_nacimiento = factor(c(rep("Primogénito", length(primogenitos)),
+                              rep("Segundo", length(segundos)),
+                              rep("Tercero", length(terceros))))
+)
+```
+
+```{r}
+# Combinar todos los datos en un vector único
+todos_los_datos <- c(primogenitos, segundos, terceros)
+
+# Crear un vector de grupo correspondiente
+grupo <- factor(c(rep("Primogénito", length(primogenitos)),
+                  rep("Segundo", length(segundos)),
+                  rep("Tercero", length(terceros))))
+
+# Calcular los rangos de todas las observaciones
+rangos <- rank(todos_los_datos)
+
+# Calcular la suma de rangos para cada grupo
+suma_rangos <- tapply(rangos, grupo, sum)
+
+# Número total de observaciones
+N <- length(todos_los_datos)
+
+# Calcular el estadístico de Kruskal-Wallis
+EP <- (12 / (N * (N + 1))) * sum(suma_rangos^2 / table(grupo)) - 3 * (N + 1)
+
+# Mostrar el estadístico de prueba 
+EP
+
+```
+
+```{r}
+# Realizar la prueba de Kruskal-Wallis
+
+kruskal_test <- kruskal.test(asertividad ~ orden_nacimiento, data = datos)
+
+
+print(kruskal_test)
+
+if(kruskal_test$p.value < 0.05) {
+  cat("Hay evidencia suficiente para rechazar la hipótesis nula. Existen diferencias significativas en los niveles de asertividad entre los distintos órdenes de nacimiento.\n")
+} else {
+  cat("No hay evidencia suficiente para rechazar la hipótesis nula. No se observan diferencias significativas en los niveles de asertividad entre los distintos órdenes de nacimiento.\n")
+}
+```
+
+```{r}
+
+library(ggplot2)
+
+ggplot(datos, aes(x = orden_nacimiento, y = asertividad, fill = orden_nacimiento)) +
+  geom_boxplot() +
+  labs(title = "Asertividad según orden de nacimiento",
+       x = "Orden de nacimiento",
+       y = "Puntuación de asertividad") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Pastel1") +
+  theme(legend.title = element_blank()) 
+
+```
+
+```{r}
+
+ggplot(datos, aes(x = asertividad, fill = orden_nacimiento)) +
+  geom_density(alpha = 0.75) + # Ajusta la transparencia con 'alpha'
+  labs(title = "Distribución de asertividad según orden de nacimiento",
+       x = "Puntuación de asertividad",
+       y = "Densidad") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Pastel1") + 
+  theme(legend.title = element_blank()) 
+
+```
