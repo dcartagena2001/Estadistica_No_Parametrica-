@@ -37,3 +37,116 @@ execute:
 \pagestyle{myheadings}
 \setcounter{page}{2}
 ```
+
+```{r}
+library(tidyverse)
+library(knitr)
+```
+
+
+# Punto 1 
+
+Se desea ver si la temperatura en la ciudad 1 es superior a la tempe-
+ratura en la ciudad 2, las temperaturas tomadas en las dos ciudades,
+en el verano, son las siguientes:
+
+
+| Ciudad   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | 9   |
+|----------|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+| Ciudad 1 | 83  | 89  | 89  | 90  | 91  | 91  | 92  | 94  | 96  |
+| Ciudad 2 | 77  | 78  | 79  | 80  | 81  | 81  | 81  | 82  |     |
+: Temperaturas registradas cuidad {#tbl-Temperaturas}
+
+
+Use $\alpha =0.05$
+
+## solucion 
+
+Sea 
+
+::: {}
+* x: Temperatura[^longnote] de la cuidad 1
+* y: Temperatura[^longnote] de la cuidad 2
+::: 
+
+A continuacion se plantea el siguiente juego de hipotesis 
+
+$$
+\begin{cases}
+          H_0:E(x) \leq E(y)\\
+          H_1:E(x)>E(y)
+\end{cases}
+$$
+
+Equivalente a:
+
+
+::: {}
+* $H_o:$ la temperatura en la ciudad 1 es inferior a la temperatura en la ciudad 2
+* $H_1:$ la temperatura en la ciudad 1 es superior a la temperatura en la ciudad 2
+:::
+
+Supongamos que las mediciones de temperatura se realizaron de forma aleatoria, garantizando así la independencia en la selección de la muestra. Observemos que también se cumple la independencia entre las temperaturas registradas en ambas ciudades, ya que la medición en una ciudad no debería influir en la otra. Además, es importante destacar que la temperatura se mide en una escala de intervalo.Por tanto es valido aplicar el test Mann-Whitney
+
+
+```{r}
+c1 <- c(83,89,89,90,91,91,92,94,96)
+c2 <- c(77,78,79,80,81,81,81,82)
+```
+
+
+```{r}
+df.T <- data.frame(Tr=c(rep("c1", times=length(c1)),
+                          rep("c2", times=length(c2))),
+                   tem=c(c1, c2))
+#asignación de rangos de menor a mayor, con promedio de iguales
+R <- rank(df.T$tem, ties.method = "average")
+#tabla con resultados
+ranked <- cbind(df.T,R)
+k <- arrange(ranked,R)
+
+```
+
+
+En el contexto de la prueba de Mann-Whitney, los puntajes se ordenan y clasifican siguiendo un método específico para su análisis comparativo entre dos grupos independientes.
+
+|Tr | tem|    R|
+|:--|---:|----:|
+|c2 |  77|  1.0|
+|c2 |  78|  2.0|
+|c2 |  79|  3.0|
+|c2 |  80|  4.0|
+|c2 |  81|  6.0|
+|c2 |  81|  6.0|
+|c2 |  81|  6.0|
+|c2 |  82|  8.0|
+|c1 |  83|  9.0|
+|c1 |  89| 10.5|
+|c1 |  89| 10.5|
+|c1 |  90| 12.0|
+|c1 |  91| 13.5|
+|c1 |  91| 13.5|
+|c1 |  92| 15.0|
+|c1 |  94| 16.0|
+|c1 |  96| 17.0|
+: Rangos {#tbl-Rangos}
+
+Al asignar los rangos a cada una de las diferentes temperaturas en  @tbl-Rangos se observo que existen 3 grupos de empates en medida de la temperatura 
+
+
+
+# Apendice de codigo
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
+
+
+# Bibliografía
+
+::: {#refs}
+:::
+
+
+[^longnote]:no se indico las unidades en que fueron reportadas las temperaturas
+
+
