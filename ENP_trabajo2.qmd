@@ -695,6 +695,8 @@ la naturaleza de los datos o la sensibilidad inherente a cada test
 puedan influir en la interpretación de la relación entre las variables.
 
 
+# prueba
+
 # Apendice de codigo
 
 ```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
