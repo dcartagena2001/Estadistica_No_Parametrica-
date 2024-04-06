@@ -103,7 +103,6 @@ podría variar dependiendo de otros factores no considerados en este
 análisis.
 
 
-CAMBIOS PARA GIT
 TEST2
 
 MERGE DESDE GIT BASH
