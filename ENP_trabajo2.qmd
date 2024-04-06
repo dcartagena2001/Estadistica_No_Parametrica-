@@ -837,6 +837,10 @@ $$
 
 Al llevar a cabo los análisis de correlación mediante las metodologías de Pearson, Spearman y Kendall, se han obtenido resultados que nos permiten establecer distintas inferencias sobre la relación entre las puntuaciones de los individuos en estudio. El test de Pearson resultó en un p-valor de 0.004951, indicando con claridad la existencia de una correlación lineal negativa significativa y justificando el rechazo de la hipótesis nula de independencia. Por el contrario, el método de Spearman generó un p-valor de 0.05961, que supera el nivel de significación establecido de 0.05, lo cual significa que no hay evidencia suficiente para descartar la hipótesis nula y, por ende, no se puede afirmar la presencia de una relación monótona significativa. En el caso del test de Kendall, el p-valor obtenido fue de 0.03811, que está por debajo del umbral de significancia y sugiere una correlación negativa significativa en términos de rango. Estos hallazgos indican que, según los tests de Pearson y Kendall, las puntuaciones no son independientes y comparten una relación negativa. No obstante, la ausencia de evidencia significativa en la prueba de Spearman para un nivel de confianza del 95% nos insta a considerar la posibilidad de que la naturaleza de los datos o la sensibilidad inherente a cada test puedan influir en la interpretación de la relación entre las variables.
 
+
+
+# Prueba
+
 # Apendice de codigo.
 
 ```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
