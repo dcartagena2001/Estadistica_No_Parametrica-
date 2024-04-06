@@ -259,7 +259,7 @@ ggplot(datos, aes(x = asertividad, fill = orden_nacimiento)) +
 
 ```
 
-# Punto 4
+# Punto 4....-...
 
 Una pareja de esposos salieron a jugar bolos y guardaron sus resultados para ver si existia una relación entre dichos resultados Use $ρ$ de Pearson, el $\tau$ de kendall y el $ρ$ de spearman para realizar una prueba de independencia entre los puntajes.
 
