@@ -264,7 +264,7 @@ ggplot(datos, aes(x = asertividad, fill = orden_nacimiento)) +
 ```
 
 
-# Punto 4 
+# Punto 4.
 
 
 -   Coeficiente de correlación de Pearson ( $ρ$ de Pearson): Mide la
