@@ -101,3 +101,8 @@ podría interpretarse como que cuando uno de los dos tiene un buen día en
 el juego, el otro tiende a no tenerlo, aunque la interpretación exacta
 podría variar dependiendo de otros factores no considerados en este
 análisis.
+
+
+TEST2
+
+MERGE DESDE GIT BASH
