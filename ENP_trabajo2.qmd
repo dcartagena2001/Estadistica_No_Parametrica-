@@ -1273,7 +1273,8 @@ plano ¿Que puede concluir?
 
 
 
-f) Estime el millaje, para Galones=16.
+
+
 
 # Apendice de codigo
 
