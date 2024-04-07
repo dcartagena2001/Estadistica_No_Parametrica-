@@ -40,6 +40,7 @@ execute:
 ```{r}
 library(tidyverse)
 library(knitr)
+library(magrittr)
 ```
 
 # Punto 1
@@ -276,7 +277,7 @@ prueba de independencia entre los puntajes.
 |--------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
 | Esposa | 122 | 128 | 125 | 123 | 115 | 120 | 108 | 143 | 124 | 123 |
 
-```{r,include=FALSE}
+```{r}
 esposo <- c(147, 158, 131, 142, 183, 151, 196, 129, 155, 158)
 esposa <- c(122, 128, 125, 123, 115, 120, 108, 143, 124, 123)
 ```
@@ -376,7 +377,7 @@ el promedio de rangos correspondiente, un procedimiento alineado con el
 test de Mann-Whitney.
 
 $$
-\frac{
+\rho=\frac{
   \sum_{i=1}^{n} R(x_i) R(y_i) - n \left(\frac{n+1}{2}\right)^2
 }{
   \sqrt{
@@ -432,7 +433,7 @@ $$
     \cdot
     (384.5 - 10\left(\frac{10+1}{2}\right)^2)
   }
-} = 0.6128049
+} = -0.6128049
 $$
 
 Implementación en R
@@ -642,9 +643,11 @@ print(pearson)
 
 $$
 H_0: \rho = 0 \quad \text{Los puntajes son independientes},
-$$ $$
+$$ 
+$$
 H_1: \rho \neq 0 \quad \text{Los puntajes no son independientes},
-$$ $$
+$$ 
+$$
 p\text{-valor} = 0.004951 < 0.05 \quad \quad \text{Rechazamos } H_0,
 $$
 
@@ -657,9 +660,12 @@ print(spearman)
 
 $$
 H_0: \rho_s = 0 \quad \text{Los puntajes son independientes},
-$$ $$
+$$ 
+
+$$
 H_1: \rho_s \neq 0 \quad \text{Los puntajes no son independientes},
-$$ $$
+$$ 
+$$
 p\text{-valor} = 0.05961 > 0.05 \quad \quad \text{No rechazamos } H_0,
 $$
 
@@ -672,9 +678,11 @@ print(kendall)
 
 $$
 H_0: \tau = 0 \quad \text{Los puntajes son independientes},
-$$ $$
+$$ 
+$$
 H_1: \tau \neq 0 \quad \text{Los puntajes no son independientes},
-$$ $$
+$$ 
+$$
 p\text{-valor} = 0.03811 < 0.05 \quad  \quad \text{Rechazamos } H_0,
 $$
 
@@ -699,8 +707,573 @@ nivel de confianza del 95% nos insta a considerar la posibilidad de que
 la naturaleza de los datos o la sensibilidad inherente a cada test
 puedan influir en la interpretación de la relación entre las variables.
 
+# Punto 5
+
+Cada vez que un carro tanqueaba, un dispositivo llevó el control de la cantidad de gasolina en galones puestos en el tanque, y la distancia en millas recorridas, los resultados fueron:
+
+| Millas | 142 | 116 | 194 | 250 |  88 | 157 | 255 | 154 |  43 | 208 |
+|--------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+| Galones| 11.1|  5.7| 14.2| 15.8|  7.5| 12.5| 17.4|  8.8|  3.4| 15.2|
+
+```{r}
+# dataframe
+df.5 <- data.frame(
+  Millas = c(142, 116, 194, 250, 88, 157, 255, 154, 43, 208),
+  Galones = c(11.1, 5.7, 14.2, 15.8, 7.5, 12.5, 17.4, 8.8, 3.4, 15.2)
+)
+```
 
 
+a) Suponga que la EPA estima que el millaje de este carro es 18
+millas por galón. Pruebe la hipótesis de que esta cifra se aplica a
+este carro en particular.
+
+Veamos que en este caso en particular, se determina por variable independiente la cantidad de gasolina, y por variable dependiente la cantidad de millas recorridas
+
+A continuacion determinara si la tasa de consumo de gasolina de este auto es de 18 millas por galón,lo cual es equivalente a probar si la pendiente de la recta de regresión del Consumo de Gasolina respecto a las millas recorridas es dicha cantidad, para lo cual se plantea el siguiente juego de hipotesis:
+
+$$
+\begin{cases}
+          H_0:\beta \geq 18 \\
+          H_1:\beta < 18
+\end{cases}
+$$
+Para calcular dicho valor se procedera a calcular el coeficiente de Spearman entre la variable Galones y los residuos muestrales $u=Millas-18x$ 
+
+A continuacion se calculara el dichas diferencias 
+
+```{r}
+n <- length(df.5$Galones)
+u <- df.5$Millas-18*df.5$Galones
+Ru <- rank(u)
+Rx <- rank(df.5$Galones)
+k <- cbind(df.5$Galones,Rx,u,Ru) %>% kable(format = 'markdown')
+```
+
+| $x_i$  |$R(x_i)$| $u_i$| $R(u_i)$|
+|----:|--:|-----:|--:|
+| 11.1|  5| -57.8|  5|
+|  5.7|  2|  13.4| 10|
+| 14.2|  7| -61.6|  3|
+| 15.8|  9| -34.4|  7|
+|  7.5|  3| -47.0|  6|
+| 12.5|  6| -68.0|  1|
+| 17.4| 10| -58.2|  4|
+|  8.8|  4|  -4.4|  9|
+|  3.4|  1| -18.2|  8|
+| 15.2|  8| -65.6|  2|
+
+Con dichos resultados a continuacion se mostraran resultados importantes para el el calculo del coeficiente de Spearman:
+
+$\sum_{i=1}^{10}R(x_{i})R(u_{i})=$ `r sum(Rx*Ru)` ,   $\sum_{i=10}^{10}R(u_i)^{2}=$ `r sum(Ru**2)` ,   $\sum_{i=10}^{10}R(x_i)^{2}=$ `r sum(Rx**2)`,  $n(\frac{n+1}{2})^{2}=$ `r n*((n+1)/2)**2`
+
+
+$$
+\rho=\frac{
+  \sum_{i=1}^{n} R(x_i) R(y_i) - n \left(\frac{n+1}{2}\right)^2
+}{
+  \sqrt{
+    \left( \sum_{i=1}^{n} R^2(x_i) - n \left(\frac{n+1}{2}\right)^2 \right)
+    \left( \sum_{i=1}^{n} R^2(y_i) - n \left(\frac{n+1}{2}\right)^2 \right)
+  }
+} = \frac{`r sum(Rx*Ru)` - `r n*((n+1)/2)**2` }{\sqrt{(`r sum(Ru**2)` - `r n*((n+1)/2)**2`)(`r sum(Rx**2)` - `r n*((n+1)/2)**2`)}} = \frac{`r sum(Rx*Ru)-n*((n+1)/2)**2`}{\sqrt{ (`r sum(Ru**2) - n*((n+1)/2)**2`)(`r sum(Rx**2)- n*((n+1)/2)**2`)}} = `r (sum(Rx*Ru)-n*((n+1)/2)**2)/ ((sum(Ru**2) - n*((n+1)/2)**2)*( sum(Rx**2)- n*((n+1)/2)**2))**0.5`
+$$
+
+Luego con $\rho$ ya calculado se procede a calcular, a evaluar el juego de hipotesis 
+
+Después de obtener el coeficiente de correlación $\rho$, se procede a realizar una evaluación del juego de hipótesis, mediante el criterio del valor p
+
+$$
+valor-p=p(z<\rho\sqrt{9})
+$$
+EL calculo del valor-p es `r pnorm(-0.6*3)`, por tanto es valido afirmar que la tasa de consumo de Gasolina propuesto por la EPA no es consistente con este automovil.
+
+b) Encuentre un intervalo de confianza del 95 % para la pendiente de la recta obtenida en el numeral anterior. Hagalo a mano.
+
+A continuacion se procedera a encontrar cada pendiente
+
+### Pendientes del grupo 1
+
+```{r}
+j <- 1 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+$$
+\frac{`r g[j+3]`}{`r h[j+3]`}= `r round(y[j+3]/x[j+3],3)`
+$$
+
+$$
+\frac{`r g[j+4]`}{`r h[j+4]`}= `r round(y[j+4]/x[j+4],3)`
+$$
+
+$$
+\frac{`r g[j+5]`}{`r h[j+5]`}= `r round(y[j+5]/x[j+5],3)`
+$$
+$$
+\frac{`r g[j+6]`}{`r h[j+6]`}= `r round(y[j+6]/x[j+6],3)`
+$$
+
+$$
+\frac{`r g[j+7]`}{`r h[j+7]`}= `r round(y[j+7]/x[j+7],4)`
+$$
+
+$$
+\frac{`r g[j+8]`}{`r h[j+8]`}= `r round(y[j+8]/x[j+8],3)`
+$$
+
+$$
+\frac{`r g[j+9]`}{`r h[j+9]`}= `r round(y[j+9]/x[j+9],3)`
+$$
+
+
+### Pendientes del grupo 2
+
+```{r}
+j <- 2 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+$$
+\frac{`r g[j+3]`}{`r h[j+3]`}= `r round(y[j+3]/x[j+3],3)`
+$$
+
+$$
+\frac{`r g[j+4]`}{`r h[j+4]`}= `r round(y[j+4]/x[j+4],3)`
+$$
+
+$$
+\frac{`r g[j+5]`}{`r h[j+5]`}= `r round(y[j+5]/x[j+5],3)`
+$$
+$$
+\frac{`r g[j+6]`}{`r h[j+6]`}= `r round(y[j+6]/x[j+6],3)`
+$$
+
+$$
+\frac{`r g[j+7]`}{`r h[j+7]`}= `r round(y[j+7]/x[j+7],4)`
+$$
+
+$$
+\frac{`r g[j+8]`}{`r h[j+8]`}= `r round(y[j+8]/x[j+8],3)`
+$$
+
+### Pendientes del grupo 3
+
+```{r}
+j <- 3 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+$$
+\frac{`r g[j+3]`}{`r h[j+3]`}= `r round(y[j+3]/x[j+3],3)`
+$$
+
+$$
+\frac{`r g[j+4]`}{`r h[j+4]`}= `r round(y[j+4]/x[j+4],3)`
+$$
+
+$$
+\frac{`r g[j+5]`}{`r h[j+5]`}= `r round(y[j+5]/x[j+5],3)`
+$$
+$$
+\frac{`r g[j+6]`}{`r h[j+6]`}= `r round(y[j+6]/x[j+6],3)`
+$$
+
+$$
+\frac{`r g[j+7]`}{`r h[j+7]`}= `r round(y[j+7]/x[j+7],4)`
+$$
+
+### Pendientes del grupo 4
+
+```{r}
+j <- 4 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+$$
+\frac{`r g[j+3]`}{`r h[j+3]`}= `r round(y[j+3]/x[j+3],3)`
+$$
+
+$$
+\frac{`r g[j+4]`}{`r h[j+4]`}= `r round(y[j+4]/x[j+4],3)`
+$$
+
+$$
+\frac{`r g[j+5]`}{`r h[j+5]`}= `r round(y[j+5]/x[j+5],3)`
+$$
+$$
+\frac{`r g[j+6]`}{`r h[j+6]`}= `r round(y[j+6]/x[j+6],3)`
+$$
+
+
+
+### Pendientes del grupo 5
+
+```{r}
+j <- 5 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+$$
+\frac{`r g[j+3]`}{`r h[j+3]`}= `r round(y[j+3]/x[j+3],3)`
+$$
+
+$$
+\frac{`r g[j+4]`}{`r h[j+4]`}= `r round(y[j+4]/x[j+4],3)`
+$$
+
+$$
+\frac{`r g[j+5]`}{`r h[j+5]`}= `r round(y[j+5]/x[j+5],3)`
+$$
+
+### Pendientes del grupo 6
+
+```{r}
+j <- 6 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+$$
+\frac{`r g[j+3]`}{`r h[j+3]`}= `r round(y[j+3]/x[j+3],3)`
+$$
+
+$$
+\frac{`r g[j+4]`}{`r h[j+4]`}= `r round(y[j+4]/x[j+4],3)`
+$$
+
+### Pendientes del grupo 7
+
+```{r}
+j <- 7 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+$$
+\frac{`r g[j+3]`}{`r h[j+3]`}= `r round(y[j+3]/x[j+3],3)`
+$$
+
+### Pendientes del grupo 8
+
+```{r}
+j <- 8 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+$$
+\frac{`r g[j+2]`}{`r h[j+2]`}= `r round(y[j+2]/x[j+2],3)`
+$$
+
+
+
+
+### Pendientes del grupo 9
+
+```{r}
+j <- 9 ## pareja de comparacion
+h <- numeric(9)
+g <- numeric(9)
+y <- numeric(9)
+x <- numeric(9)
+for (i in j+1:10){h[i] <- paste(df.5$Galones[j],'-',df.5$Galones[i])
+                g[i] <- paste(df.5$Millas[j],'-',df.5$Millas[i])
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+
+```
+
+
+$$
+\frac{`r g[j+1]`}{`r h[j+1]`}= `r round(y[j+1]/x[j+1],3)`
+$$
+
+```{r}
+j <- 1 ## pareja de comparacion
+comparar <- function(j){
+y <- numeric(9)
+x <- numeric(9)
+for (i in seq(j+1,10,1)){
+                y[i] <- df.5$Millas[j]-df.5$Millas[i]
+                x[i] <- df.5$Galones[j]-df.5$Galones[i]
+}
+                return(y/x)
+}
+c1 <- comparar(1)
+c2 <- comparar(2)
+c3 <- comparar(3)
+c4 <- comparar(4)
+c5 <- comparar(5)
+c6 <- comparar(6)
+c7 <- comparar(7)
+c8 <- comparar(8)
+c9 <- comparar(9)
+k <- c(c1,c2,c3,c4,c5,c6,c7,c8,c9)
+k <- k[complete.cases(k)]
+#cbind(c1,c2,c3,c4,c5,c6,c7,c8,c9) %>% kable(format = 'markdown')
+```
+
+| **Pareja**            | **P1**   | **P2**   | **P3**   | **P4**   | **P5**   | **P6**   | **P7**   | **P8**   | **P9**   |
+|-----------------------|---------:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|
+| **P2 = (116, 5.7)**   |   4.8148 |          |          |          |         |           |          |          |          |
+| **P3 = (194, 14.2)**  |  16.7742 |   9.1765 |          |          |         |           |          |          |          |
+| **P4 = (250, 15.8)**  |  22.9787 |  13.2673 |  35.0000 |          |         |           |          |          |          |
+| **P5 = (88, 7.5)**    |  15.0000 | -15.5556 |  15.8209 |  19.5181 |         |           |          |          |          |
+| **P6 = (157, 12.5)**  |  10.7143 |   6.0294 |  21.7647 |  28.1818 |  13.8000 |          |          |          |          |
+| **P7 = (255, 17.4)**  |  17.9365 |  11.8803 |  19.0625 |   3.1250 |  16.8687 |  20.0000 |          |          |          |
+| **P8 = (154, 8.8)**   |  -5.2174 |  12.2581 |   7.4074 |  13.7143 |  50.7692 |   0.8108 |  11.7442 |          |          |
+| **P9 = (43, 3.4)**    |  12.8571 |  31.7391 |  13.9815 |  16.6935 |  10.9756 |  12.5275 |  15.1429 |  20.5556 |          |
+|**P10 = (208, 15.2)**  |  16.0976 |   9.6842 |  14.0000 |  70.0000 |  15.5844 |  18.8889 |  21.3636 |   8.4375 |  13.9831 |
+
+ Veamos que segun tabla A.11 del libro de, cuando n=10, el valor de dicho de $W_{0.975}=21$
+
+N= 10C2 =45, luego 
+
+$r=\frac{1}{2}(N-W_{0.975})= 0.5(45-21)=12$
+
+$s= N+1-r=45+1-12=34$
+
+## Raro esto no esta dando -- Kendall {SuppDists}
+Un IC al 95$\%$ esta dado por:
+$[S^{(12)},S^{(34)}]=[10.975,19.062]$
+
+
+
+```{r}
+sort(k)
+```
+
+c) Ajuste una recta de regresión lineal usando el método de mínimos cuadrados.
+
+Para aplicar la refresion lineal por minimos cuadrados, se hara uso del la funcion lm del paquete stats, del software estadistico R, para encontrar el ajuste de estos datos 
+
+```{r}
+lm(df.5$Millas~df.5$Galones)
+```
+
+
+d)  Obtenga una recta de regresión monótona como la vista en clase. hagalo a mano y luego usando software.
+
+A continuacion se procede a calcular cada la regresion monotona 
+
+```{r}
+nd <- data.frame(x=df.5$Galones,y=df.5$Millas,
+                 Rx=rank(df.5$Galones),Ry=rank(df.5$Millas))
+```
+
+|x|y|$R(X_i)$|$R(Y_i)$|
+|----:|---:|--:|--:|
+| 11.1| 142|  5|  4|
+|  5.7| 116|  2|  3|
+| 14.2| 194|  7|  7|
+| 15.8| 250|  9|  9|
+|  7.5|  88|  3|  2|
+| 12.5| 157|  6|  6|
+| 17.4| 255| 10| 10|
+|  8.8| 154|  4|  5|
+|  3.4|  43|  1|  1|
+| 15.2| 208|  8|  8|
+: Rangos de las variable {#tbl-rang}
+
+Veamos que en @tbl-rang se encuentran los rangos de la variable Galones de gasolina(x) y de Millas recorridas(y) con las cuales se procede a estimar el intercepto y la pendiente de la recta de regresion monotona 
+
+```{r}
+n <- length(df.5$Millas)
+b2 <- function(Rx,Ry,n){
+numerator <- sum(Rx*Ry) - n * ((n + 1)^2 / 4)
+denominator <- sum(Rx^2) - n * ((n + 1)^2 / 4)
+
+# Calculate b2
+b2 <- numerator / denominator
+return(b2)
+}
+a2 <- function(b2,n){
+  numerator <- (1-b2)*(n-1)
+  
+a2 <- numerator /2
+return(a2)
+}
+lmnp <- function(x,a2,b2){
+  return(a2+b2*x)
+}
+lmnp <- Vectorize(lmnp)
+b2 <- round(b2(nd$Rx,nd$Ryn,n),3)
+a2 <- a2(b2,n)
+```
+
+
+$b_2=\frac{\sum_{i=1}^{10}R(X_i)R(Y_i)-n((n+1)^{2}/4)}{\sum_{i=1}^{10}R(X_i)^{2}-n((n+1)^{2}/4)}$
+$a_{2}=\frac{(1-b_2)(n+1)}{2}$
+
+Con lo cual se obtiene y=`r a2` `r round(b2,3)`*x
+
+Se procede a encontrar la estimacion el rango estimado de y $(\widehat{R(y_i)})=a_2+b_2X$ 
+
+$\widehat{R(Y_1)}=$ `r a2` `r b2`* $R(X_1)=$ `r round(lmnp(nd[,3][1],a2,b2),3)`
+
+$\widehat{R(Y_2)}=$ `r a2` `r b2`* $R(X_2)=$ `r round(lmnp(nd[,3][2],a2,b2),3)`
+
+$\widehat{R(Y_3)}=$ `r a2` `r b2`*$R(X_3)=$ `r round(lmnp(nd[,3][3],a2,b2),3)`
+
+$\widehat{R(Y_4)}=$ `r a2` `r b2`*$R(X_4)=$ `r round(lmnp(nd[,3][4],a2,b2),3)`
+
+$\widehat{R(Y_5)}=$ `r a2` `r b2`*$R(X_5)=$ `r round(lmnp(nd[,3][5],a2,b2),3)`
+
+$\widehat{R(Y_6)}=$ `r a2` `r b2`*$R(X_6)=$ `r round(lmnp(nd[,3][6],a2,b2),3)`
+
+$\widehat{R(Y_7)}=$ `r a2` `r b2`*$R(X_7)=$ `r round(lmnp(nd[,3][7],a2,b2),3)`
+
+$\widehat{R(Y_8)}=$ `r a2` `r b2`*$R(X_8)=$ `r round(lmnp(nd[,3][8],a2,b2),3)`
+
+$\widehat{R(Y_9)}=$ `r a2` `r b2`*$R(X_9)=$ `r round(lmnp(nd[,3][9],a2,b2),3)`
+
+$\widehat{R(Y_10)}=$ `r a2` `r b2`*$R(X_{10})=$ `r round(lmnp(nd[,3][10],a2,b2),3)`
+
+
+e) gráfique la funciones de los numerales anteriores en un mismo
+plano ¿Que puede concluir?
+
+
+
+f) Estime el millaje, para Galones=16.
 
 # Apendice de codigo
 
